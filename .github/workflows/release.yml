@@ -1,0 +1,16 @@
+name: Release to Environment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: Deploy Infrastructure
+    uses: ./.github/workflows/workflow-infra.yaml
+    permissions:
+      id-token: write  # Require write permission to Fetch an OIDC token.
+      contents: read
+      pull-requests: write # Required for Terraform to create PRs for changes.
+    secrets: inherit

@@ -1,0 +1,43 @@
+name: Terraform Workflow
+
+on:
+  workflow_call:
+
+jobs:
+  terraform:
+    name: Terraform
+    environment:
+      name: ${{ inputs.environment-name }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: false
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Azure CLI Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_TERRAFORM }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Initialize terraform
+        working-directory: infra/
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          terraform init
+
+      - name: Terraform Apply
+        id: terraform-apply
+        working-directory: infra/
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          terraform apply \
+          -var github_token=${{ secrets.GH_TOKEN }} \
+          -auto-approve
