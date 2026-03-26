@@ -40,4 +40,5 @@ jobs:
         run: |
           terraform apply \
           -var github_token=${{ secrets.GH_TOKEN }} \
+          -var mysql_admin_password=${{ secrets.MYSQL_ADMIN_PASSWORD }} \
           -auto-approve
