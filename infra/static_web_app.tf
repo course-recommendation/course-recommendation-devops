@@ -12,3 +12,9 @@ resource "azurerm_static_web_app" "stapp" {
     ]
   }
 }
+
+resource "azurerm_static_web_app_custom_domain" "example" {
+  static_web_app_id = azurerm_static_web_app.stapp.id
+  domain_name       = "${azurerm_dns_cname_record.stapp_cname.name}.${azurerm_dns_zone.dns_zone.name}"
+  validation_type   = "cname-delegation"
+}

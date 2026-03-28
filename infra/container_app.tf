@@ -4,6 +4,12 @@ resource "azurerm_container_app_environment" "cae" {
   location                   = azurerm_resource_group.rg.location
   logs_destination           = "log-analytics"
   log_analytics_workspace_id = azurerm_log_analytics_workspace.log.id
+  workload_profile {
+    maximum_count         = 0
+    minimum_count         = 0
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }
 }
 
 resource "azurerm_container_app" "ca" {
@@ -11,6 +17,8 @@ resource "azurerm_container_app" "ca" {
   container_app_environment_id = azurerm_container_app_environment.cae.id
   resource_group_name          = azurerm_container_app_environment.cae.resource_group_name
   revision_mode                = "Single"
+
+  workload_profile_name = "Consumption"
 
   registry {
     server   = azurerm_container_registry.acr.login_server
@@ -43,7 +51,7 @@ resource "azurerm_container_app" "ca" {
 
   lifecycle {
     ignore_changes = [
-      template[0].container
+      template[0].container,
     ]
   }
 
@@ -68,4 +76,49 @@ resource "azurerm_container_app" "ca" {
     key_vault_secret_id = azurerm_key_vault_secret.mysql-root-password.versionless_id
   }
   depends_on = [azurerm_role_assignment.key_vault_id]
+}
+
+resource "azurerm_container_app_custom_domain" "ca_custom_domain" {
+  name             = "${azurerm_dns_cname_record.ca_cname.name}.${azurerm_dns_zone.dns_zone.name}"
+  container_app_id = azurerm_container_app.ca.id
+
+  lifecycle {
+    // When using an Azure created Managed Certificate these values must be added to ignore_changes to prevent resource recreation.
+    ignore_changes = [certificate_binding_type, container_app_environment_certificate_id]
+  }
+}
+
+resource "azapi_resource" "managed_cert" {
+  type      = "Microsoft.App/managedEnvironments/managedCertificates@2025-07-01"
+  name      = azurerm_container_app_custom_domain.ca_custom_domain.name
+  parent_id = azurerm_container_app_environment.cae.id
+  location  = azurerm_resource_group.rg.location
+
+  body = {
+    properties = {
+      subjectName             = azurerm_container_app_custom_domain.ca_custom_domain.name
+      domainControlValidation = "CNAME"
+    }
+  }
+}
+
+resource "azapi_update_resource" "bind_domain" {
+  type        = "Microsoft.App/containerApps@2025-07-01"
+  resource_id = azurerm_container_app.ca.id
+
+  body = {
+    properties = {
+      configuration = {
+        ingress = {
+          customDomains = [
+            {
+              name          = azurerm_container_app_custom_domain.ca_custom_domain.name
+              bindingType   = "SniEnabled"
+              certificateId = azapi_resource.managed_cert.id
+            }
+          ]
+        }
+      }
+    }
+  }
 }
