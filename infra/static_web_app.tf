@@ -13,7 +13,15 @@ resource "azurerm_static_web_app" "stapp" {
   }
 }
 
-resource "azurerm_static_web_app_custom_domain" "example" {
+resource "azurerm_dns_cname_record" "stapp_cname" {
+  name                = "www"
+  zone_name           = azurerm_dns_zone.dns_zone.name
+  resource_group_name = azurerm_resource_group.rg.name
+  ttl                 = 300
+  record              = azurerm_static_web_app.stapp.default_host_name
+}
+
+resource "azurerm_static_web_app_custom_domain" "stapp_custom_domain" {
   static_web_app_id = azurerm_static_web_app.stapp.id
   domain_name       = "${azurerm_dns_cname_record.stapp_cname.name}.${azurerm_dns_zone.dns_zone.name}"
   validation_type   = "cname-delegation"

@@ -6,8 +6,6 @@ on:
 jobs:
   terraform:
     name: Terraform
-    environment:
-      name: ${{ inputs.environment-name }}
     runs-on: ubuntu-22.04
     steps:
       - name: Setup Terraform
@@ -41,4 +39,5 @@ jobs:
           terraform apply \
           -var github_token=${{ secrets.GH_TOKEN }} \
           -var mysql_admin_password=${{ secrets.MYSQL_ADMIN_PASSWORD }} \
+          -var openai_api_key=${{ secrets.OPENAI_API_KEY }} \
           -auto-approve

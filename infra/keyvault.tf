@@ -31,3 +31,9 @@ resource "azurerm_key_vault_secret" "mysql-root-password" {
   value        = azurerm_mysql_flexible_server.mysql_server.administrator_password
   key_vault_id = azurerm_key_vault.kv.id
 }
+
+resource "azurerm_key_vault_secret" "openai-api-key" {
+  name         = "openai-api-key"
+  value        = var.openai_api_key
+  key_vault_id = azurerm_key_vault.kv.id
+}
