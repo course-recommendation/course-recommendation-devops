@@ -1,7 +1,7 @@
 resource "azurerm_mysql_flexible_server" "mysql_server" {
   name                   = "mysqlserver-${local.project_name}"
   resource_group_name    = azurerm_resource_group.rg.name
-  location               = azurerm_resource_group.rg.location
+  location               = "Indonesia Central"
   administrator_login    = "username"
   administrator_password = var.mysql_admin_password
   sku_name               = "B_Standard_B1ms"
