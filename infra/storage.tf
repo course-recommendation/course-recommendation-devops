@@ -8,3 +8,20 @@ resource "azurerm_storage_account" "st" {
     versioning_enabled = true
   }
 }
+
+resource "azurerm_storage_management_policy" "st_policy" {
+  storage_account_id = azurerm_storage_account.st.id
+
+  rule {
+    name    = "DeletePreviousVersions"
+    enabled = true
+    filters {
+      blob_types = ["blockBlob", "appendBlob"]
+    }
+    actions {
+      version {
+        delete_after_days_since_creation = 30
+      }
+    }
+  }
+}
