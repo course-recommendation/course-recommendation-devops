@@ -15,8 +15,8 @@ resource "azurerm_container_app" "ca_ai" {
     container {
       name   = "examplecontainerapp"
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
-      cpu    = 0.25
-      memory = "0.5Gi"
+      cpu    = 0.5
+      memory = "1Gi"
     }
     cooldown_period_in_seconds = 300
   }
