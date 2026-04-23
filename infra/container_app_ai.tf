@@ -46,6 +46,12 @@ resource "azurerm_container_app" "ca_ai" {
     identity            = azurerm_user_assigned_identity.id.id
     key_vault_secret_id = azurerm_key_vault_secret.openai-api-key.versionless_id
   }
+  secret {
+    name                = "azure-storage-connection-string"
+    identity            = azurerm_user_assigned_identity.id.id
+    key_vault_secret_id = azurerm_key_vault_secret.azure-storage-connection-string.versionless_id
+  }
+
   depends_on = [azurerm_role_assignment.key_vault_id]
 }
 

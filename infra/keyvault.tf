@@ -37,3 +37,9 @@ resource "azurerm_key_vault_secret" "openai-api-key" {
   value        = var.openai_api_key
   key_vault_id = azurerm_key_vault.kv.id
 }
+
+resource "azurerm_key_vault_secret" "azure-storage-connection-string" {
+  name         = "azure-storage-connection-string"
+  value        = azurerm_storage_account.st.primary_connection_string
+  key_vault_id = azurerm_key_vault.kv.id
+}
