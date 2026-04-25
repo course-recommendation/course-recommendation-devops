@@ -117,3 +117,26 @@ resource "azapi_update_resource" "bind_domain_ai" {
     }
   }
 }
+
+resource "azapi_resource_action" "unbind_domain_on_destroy_ai" {
+  type        = "Microsoft.App/containerApps@2025-07-01"
+  resource_id = azurerm_container_app.ca_ai.id
+  method      = "PATCH"
+  when        = "destroy"
+
+  body = {
+    properties = {
+      configuration = {
+        ingress = {
+          customDomains = [
+            {
+              name        = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
+              bindingType = "Disabled"
+            }
+          ]
+        }
+      }
+    }
+  }
+  depends_on = [ azapi_resource.managed_cert_ai ]
+}
