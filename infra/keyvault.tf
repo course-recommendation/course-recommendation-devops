@@ -38,8 +38,8 @@ resource "azurerm_key_vault_secret" "openai-api-key" {
   key_vault_id = azurerm_key_vault.kv.id
 }
 
-resource "azurerm_key_vault_secret" "azure-storage-connection-string" {
-  name         = "azure-storage-connection-string"
-  value        = azurerm_storage_account.st.primary_connection_string
+resource "azurerm_key_vault_secret" "azure-client-id" {
+  name         = "azure-client-id"
+  value        = azurerm_user_assigned_identity.id.client_id
   key_vault_id = azurerm_key_vault.kv.id
 }

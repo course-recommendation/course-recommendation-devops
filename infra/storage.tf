@@ -7,6 +7,7 @@ resource "azurerm_storage_account" "st" {
   blob_properties {
     versioning_enabled = true
   }
+  shared_access_key_enabled = false
 }
 
 resource "azurerm_storage_management_policy" "st_policy" {

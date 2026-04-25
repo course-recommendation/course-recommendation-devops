@@ -9,3 +9,9 @@ resource "azurerm_role_assignment" "key_vault_id" {
   scope                = azurerm_key_vault.kv.id
   principal_id         = azurerm_user_assigned_identity.id.principal_id
 }
+
+resource "azurerm_role_assignment" "st_id" {
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = azurerm_storage_account.st.id
+  principal_id         = azurerm_user_assigned_identity.id.principal_id
+}
