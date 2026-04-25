@@ -8,24 +8,6 @@ resource "azurerm_key_vault" "kv" {
   rbac_authorization_enabled = true
 }
 
-resource "azurerm_key_vault_secret" "mysql-database-name" {
-  name         = "mysql-database-name"
-  value        = azurerm_mysql_flexible_database.mysql_db.name
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
-resource "azurerm_key_vault_secret" "mysql-url" {
-  name         = "mysql-url"
-  value        = azurerm_mysql_flexible_server.mysql_server.fqdn
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
-resource "azurerm_key_vault_secret" "mysql-username" {
-  name         = "mysql-username"
-  value        = azurerm_mysql_flexible_server.mysql_server.administrator_login
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
 resource "azurerm_key_vault_secret" "mysql-root-password" {
   name         = "mysql-root-password"
   value        = azurerm_mysql_flexible_server.mysql_server.administrator_password
@@ -35,11 +17,5 @@ resource "azurerm_key_vault_secret" "mysql-root-password" {
 resource "azurerm_key_vault_secret" "openai-api-key" {
   name         = "openai-api-key"
   value        = var.openai_api_key
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
-resource "azurerm_key_vault_secret" "azure-client-id" {
-  name         = "azure-client-id"
-  value        = azurerm_user_assigned_identity.id.client_id
   key_vault_id = azurerm_key_vault.kv.id
 }

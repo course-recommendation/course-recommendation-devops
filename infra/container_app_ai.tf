@@ -17,6 +17,14 @@ resource "azurerm_container_app" "ca_ai" {
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
       cpu    = 0.5
       memory = "1Gi"
+      env {
+        name  = "AZURE_CLIENT_ID"
+        value = azurerm_user_assigned_identity.id.client_id
+      }
+      env {
+        name        = "OPENAI_API_KEY"
+        secret_name = "openai-api-key"
+      }
     }
     cooldown_period_in_seconds = 300
   }
@@ -37,7 +45,10 @@ resource "azurerm_container_app" "ca_ai" {
 
   lifecycle {
     ignore_changes = [
-      template[0].container,
+      template[0].container[0].image,
+      template[0].container[0].liveness_probe,
+      template[0].container[0].readiness_probe,
+      template[0].container[0].startup_probe,
     ]
   }
 
@@ -45,12 +56,6 @@ resource "azurerm_container_app" "ca_ai" {
     name                = "openai-api-key"
     identity            = azurerm_user_assigned_identity.id.id
     key_vault_secret_id = azurerm_key_vault_secret.openai-api-key.versionless_id
-  }
-
-  secret {
-    name                = "azure-client-id"
-    identity            = azurerm_user_assigned_identity.id.id
-    key_vault_secret_id = azurerm_key_vault_secret.azure-client-id.versionless_id
   }
 
   depends_on = [azurerm_role_assignment.key_vault_id]
@@ -139,5 +144,5 @@ resource "azapi_resource_action" "unbind_domain_on_destroy_ai" {
       }
     }
   }
-  depends_on = [ azapi_resource.managed_cert_ai ]
+  depends_on = [azapi_resource.managed_cert_ai]
 }

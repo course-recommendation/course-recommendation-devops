@@ -35,6 +35,38 @@ resource "azurerm_container_app" "ca" {
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
       cpu    = 0.25
       memory = "0.5Gi"
+      env {
+        name = "MYSQL_DATABASE_NAME"
+        value = azurerm_mysql_flexible_database.mysql_db.name
+      }
+      env {
+        name = "MYSQL_URL"
+        value = azurerm_mysql_flexible_server.mysql_server.fqdn
+      }
+      env {
+        name = "MYSQL_USERNAME"
+        value = azurerm_mysql_flexible_server.mysql_server.administrator_login
+      }
+      env {
+        name = "MYSQL_ROOT_PASSWORD"
+        secret_name = "mysql-root-password"
+      }
+      env {
+        name = "MYSQL_PORT"
+        value = "3306"
+      }
+      env {
+        name = "JWT_EXPIRATION"
+        value = "99999999999"
+      }
+      env {
+        name = "FRONTEND_URL"
+        value = "https://${azurerm_dns_zone.dns_zone.name}"
+      }
+      env {
+        name = "AI_URL"
+        value = "https://ai.${azurerm_dns_zone.dns_zone.name}"
+      }
     }
     cooldown_period_in_seconds = 300
   }
@@ -55,24 +87,11 @@ resource "azurerm_container_app" "ca" {
 
   lifecycle {
     ignore_changes = [
-      template[0].container,
+      template[0].container[0].image,
+      template[0].container[0].liveness_probe,
+      template[0].container[0].readiness_probe,
+      template[0].container[0].startup_probe,
     ]
-  }
-
-  secret {
-    name                = "mysql-database-name"
-    identity            = azurerm_user_assigned_identity.id.id
-    key_vault_secret_id = azurerm_key_vault_secret.mysql-database-name.versionless_id
-  }
-  secret {
-    name                = "mysql-url"
-    identity            = azurerm_user_assigned_identity.id.id
-    key_vault_secret_id = azurerm_key_vault_secret.mysql-url.versionless_id
-  }
-  secret {
-    name                = "mysql-username"
-    identity            = azurerm_user_assigned_identity.id.id
-    key_vault_secret_id = azurerm_key_vault_secret.mysql-username.versionless_id
   }
   secret {
     name                = "mysql-root-password"
