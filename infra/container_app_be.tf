@@ -61,7 +61,7 @@ resource "azurerm_container_app" "ca" {
       }
       env {
         name = "FRONTEND_URL"
-        value = "https://${azurerm_dns_zone.dns_zone.name}"
+        value = "https://www.${azurerm_dns_zone.dns_zone.name}"
       }
       env {
         name = "AI_URL"
