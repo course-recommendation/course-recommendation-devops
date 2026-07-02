@@ -61,11 +61,11 @@ resource "azurerm_container_app" "ca" {
       }
       env {
         name = "FRONTEND_URL"
-        value = "https://www.${azurerm_dns_zone.dns_zone.name}"
+        value = "https://www.${data.azurerm_dns_zone.dns_zone.name}"
       }
       env {
         name = "AI_URL"
-        value = "https://ai.${azurerm_dns_zone.dns_zone.name}"
+        value = "https://ai.${data.azurerm_dns_zone.dns_zone.name}"
       }
     }
     cooldown_period_in_seconds = 300
@@ -103,8 +103,8 @@ resource "azurerm_container_app" "ca" {
 
 resource "azurerm_dns_txt_record" "ca_txt" {
   name                = "asuid.api"
-  zone_name           = azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_dns_zone.dns_zone.resource_group_name
+  zone_name           = data.azurerm_dns_zone.dns_zone.name
+  resource_group_name = data.azurerm_dns_zone.dns_zone.resource_group_name
   ttl                 = 3600
   record {
     value = azurerm_container_app.ca.custom_domain_verification_id
@@ -113,14 +113,14 @@ resource "azurerm_dns_txt_record" "ca_txt" {
 
 resource "azurerm_dns_cname_record" "ca_cname" {
   name                = "api"
-  zone_name           = azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_dns_zone.dns_zone.resource_group_name
+  zone_name           = data.azurerm_dns_zone.dns_zone.name
+  resource_group_name = data.azurerm_dns_zone.dns_zone.resource_group_name
   ttl                 = 3600
   record              = "${azurerm_container_app.ca.name}.${azurerm_container_app_environment.cae.default_domain}"
 }
 
 resource "azurerm_container_app_custom_domain" "ca_custom_domain" {
-  name             = "${azurerm_dns_cname_record.ca_cname.name}.${azurerm_dns_zone.dns_zone.name}"
+  name             = "${azurerm_dns_cname_record.ca_cname.name}.${data.azurerm_dns_zone.dns_zone.name}"
   container_app_id = azurerm_container_app.ca.id
 
   lifecycle {

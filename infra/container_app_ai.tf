@@ -63,8 +63,8 @@ resource "azurerm_container_app" "ca_ai" {
 
 resource "azurerm_dns_txt_record" "ca_txt_ai" {
   name                = "asuid.ai"
-  zone_name           = azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_dns_zone.dns_zone.resource_group_name
+  zone_name           = data.azurerm_dns_zone.dns_zone.name
+  resource_group_name = data.azurerm_dns_zone.dns_zone.resource_group_name
   ttl                 = 3600
   record {
     value = azurerm_container_app.ca_ai.custom_domain_verification_id
@@ -73,14 +73,14 @@ resource "azurerm_dns_txt_record" "ca_txt_ai" {
 
 resource "azurerm_dns_cname_record" "ca_cname_ai" {
   name                = "ai"
-  zone_name           = azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_dns_zone.dns_zone.resource_group_name
+  zone_name           = data.azurerm_dns_zone.dns_zone.name
+  resource_group_name = data.azurerm_dns_zone.dns_zone.resource_group_name
   ttl                 = 3600
   record              = "${azurerm_container_app.ca_ai.name}.${azurerm_container_app_environment.cae.default_domain}"
 }
 
 resource "azurerm_container_app_custom_domain" "ca_ai_custom_domain" {
-  name             = "${azurerm_dns_cname_record.ca_cname_ai.name}.${azurerm_dns_zone.dns_zone.name}"
+  name             = "${azurerm_dns_cname_record.ca_cname_ai.name}.${data.azurerm_dns_zone.dns_zone.name}"
   container_app_id = azurerm_container_app.ca_ai.id
 
   lifecycle {
