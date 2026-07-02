@@ -15,7 +15,7 @@ resource "azurerm_static_web_app" "stapp" {
 resource "azurerm_dns_cname_record" "stapp_cname" {
   name                = "www"
   zone_name           = data.azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = data.azurerm_dns_zone.dns_zone.resource_group_name
   ttl                 = 300
   record              = azurerm_static_web_app.stapp.default_host_name
 }
@@ -29,7 +29,7 @@ resource "azurerm_static_web_app_custom_domain" "stapp_custom_domain" {
 resource "azurerm_dns_cname_record" "stapp_cname_test1" {
   name                = "test1"
   zone_name           = data.azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = data.azurerm_dns_zone.dns_zone.resource_group_name
   ttl                 = 300
   record              = azurerm_static_web_app.stapp.default_host_name
 }
