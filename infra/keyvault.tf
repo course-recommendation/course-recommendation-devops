@@ -19,3 +19,9 @@ resource "azurerm_key_vault_secret" "openai-api-key" {
   value        = var.openai_api_key
   key_vault_id = azurerm_key_vault.kv.id
 }
+
+resource "azurerm_key_vault_secret" "mail-password" {
+  name         = "mail-password"
+  value        = var.mail_password
+  key_vault_id = azurerm_key_vault.kv.id
+}

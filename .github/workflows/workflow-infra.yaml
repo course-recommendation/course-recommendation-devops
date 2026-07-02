@@ -40,4 +40,5 @@ jobs:
           -var github_token=${{ secrets.GH_TOKEN }} \
           -var mysql_admin_password=${{ secrets.MYSQL_ADMIN_PASSWORD }} \
           -var openai_api_key=${{ secrets.OPENAI_API_KEY }} \
+          -var mail_password=${{ secrets.MAIL_PASSWORD }} \
           -auto-approve

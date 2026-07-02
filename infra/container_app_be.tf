@@ -67,6 +67,22 @@ resource "azurerm_container_app" "ca" {
         name = "AI_URL"
         value = "https://ai.${data.azurerm_dns_zone.dns_zone.name}"
       }
+      env {
+        name = "MAIL_HOST"
+        value = "smtp.gmail.com"
+      }
+      env {
+        name = "MAIL_PORT"
+        value = "587"
+      }
+      env {
+        name = "MAIL_USERNAME"
+        value = "tinvuongnhat@gmail.com"
+      }
+      env {
+        name = "MAIL_PASSWORD"
+        secret_name = "mail-password"
+      }
     }
     cooldown_period_in_seconds = 300
   }
@@ -97,6 +113,11 @@ resource "azurerm_container_app" "ca" {
     name                = "mysql-root-password"
     identity            = azurerm_user_assigned_identity.id.id
     key_vault_secret_id = azurerm_key_vault_secret.mysql-root-password.versionless_id
+  }
+  secret {
+    name                = "mail-password"
+    identity            = azurerm_user_assigned_identity.id.id
+    key_vault_secret_id = azurerm_key_vault_secret.mail-password.versionless_id
   }
   depends_on = [azurerm_role_assignment.key_vault_id]
 }
