@@ -79,70 +79,70 @@ resource "azurerm_dns_cname_record" "ca_cname_ai" {
   record              = "${azurerm_container_app.ca_ai.name}.${azurerm_container_app_environment.cae.default_domain}"
 }
 
-resource "azurerm_container_app_custom_domain" "ca_ai_custom_domain" {
-  name             = "${azurerm_dns_cname_record.ca_cname_ai.name}.${data.azurerm_dns_zone.dns_zone.name}"
-  container_app_id = azurerm_container_app.ca_ai.id
+# resource "azurerm_container_app_custom_domain" "ca_ai_custom_domain" {
+#   name             = "${azurerm_dns_cname_record.ca_cname_ai.name}.${data.azurerm_dns_zone.dns_zone.name}"
+#   container_app_id = azurerm_container_app.ca_ai.id
 
-  lifecycle {
-    // When using an Azure created Managed Certificate these values must be added to ignore_changes to prevent resource recreation.
-    ignore_changes = [certificate_binding_type, container_app_environment_certificate_id]
-  }
-}
+#   lifecycle {
+#     // When using an Azure created Managed Certificate these values must be added to ignore_changes to prevent resource recreation.
+#     ignore_changes = [certificate_binding_type, container_app_environment_certificate_id]
+#   }
+# }
 
-resource "azapi_resource" "managed_cert_ai" {
-  type      = "Microsoft.App/managedEnvironments/managedCertificates@2025-07-01"
-  name      = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
-  parent_id = azurerm_container_app_environment.cae.id
-  location  = azurerm_resource_group.rg.location
+# resource "azapi_resource" "managed_cert_ai" {
+#   type      = "Microsoft.App/managedEnvironments/managedCertificates@2025-07-01"
+#   name      = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
+#   parent_id = azurerm_container_app_environment.cae.id
+#   location  = azurerm_resource_group.rg.location
 
-  body = {
-    properties = {
-      subjectName             = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
-      domainControlValidation = "CNAME"
-    }
-  }
-}
+#   body = {
+#     properties = {
+#       subjectName             = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
+#       domainControlValidation = "CNAME"
+#     }
+#   }
+# }
 
-resource "azapi_update_resource" "bind_domain_ai" {
-  type        = "Microsoft.App/containerApps@2025-07-01"
-  resource_id = azurerm_container_app.ca_ai.id
+# resource "azapi_update_resource" "bind_domain_ai" {
+#   type        = "Microsoft.App/containerApps@2025-07-01"
+#   resource_id = azurerm_container_app.ca_ai.id
 
-  body = {
-    properties = {
-      configuration = {
-        ingress = {
-          customDomains = [
-            {
-              name          = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
-              bindingType   = "SniEnabled"
-              certificateId = azapi_resource.managed_cert_ai.id
-            }
-          ]
-        }
-      }
-    }
-  }
-}
+#   body = {
+#     properties = {
+#       configuration = {
+#         ingress = {
+#           customDomains = [
+#             {
+#               name          = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
+#               bindingType   = "SniEnabled"
+#               certificateId = azapi_resource.managed_cert_ai.id
+#             }
+#           ]
+#         }
+#       }
+#     }
+#   }
+# }
 
-resource "azapi_resource_action" "unbind_domain_on_destroy_ai" {
-  type        = "Microsoft.App/containerApps@2025-07-01"
-  resource_id = azurerm_container_app.ca_ai.id
-  method      = "PATCH"
-  when        = "destroy"
+# resource "azapi_resource_action" "unbind_domain_on_destroy_ai" {
+#   type        = "Microsoft.App/containerApps@2025-07-01"
+#   resource_id = azurerm_container_app.ca_ai.id
+#   method      = "PATCH"
+#   when        = "destroy"
 
-  body = {
-    properties = {
-      configuration = {
-        ingress = {
-          customDomains = [
-            {
-              name        = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
-              bindingType = "Disabled"
-            }
-          ]
-        }
-      }
-    }
-  }
-  depends_on = [azapi_resource.managed_cert_ai]
-}
+#   body = {
+#     properties = {
+#       configuration = {
+#         ingress = {
+#           customDomains = [
+#             {
+#               name        = azurerm_container_app_custom_domain.ca_ai_custom_domain.name
+#               bindingType = "Disabled"
+#             }
+#           ]
+#         }
+#       }
+#     }
+#   }
+#   depends_on = [azapi_resource.managed_cert_ai]
+# }
