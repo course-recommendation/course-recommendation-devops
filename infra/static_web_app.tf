@@ -3,6 +3,7 @@ resource "azurerm_static_web_app" "stapp" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku_size           = "Standard"
+  sku_tier           = "Standard"
   lifecycle {
     ignore_changes = [
       repository_branch,
