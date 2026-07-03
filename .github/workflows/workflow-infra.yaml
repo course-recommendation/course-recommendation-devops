@@ -37,8 +37,8 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
         run: |
           terraform apply \
-          -var github_token=${{ secrets.GH_TOKEN }} \
-          -var mysql_admin_password=${{ secrets.MYSQL_ADMIN_PASSWORD }} \
-          -var openai_api_key=${{ secrets.OPENAI_API_KEY }} \
-          -var mail_password=${{ secrets.MAIL_PASSWORD }} \
-          -auto-approve
+            -var="github_token=${{ secrets.GH_TOKEN }}" \
+            -var="mysql_admin_password=${{ secrets.MYSQL_ADMIN_PASSWORD }}" \
+            -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}" \
+            -var="mail_password=${{ secrets.MAIL_PASSWORD }}" \
+            -auto-approve
