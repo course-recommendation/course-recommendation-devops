@@ -83,6 +83,10 @@ resource "azurerm_container_app" "ca" {
         name = "MAIL_PASSWORD"
         secret_name = "mail-password"
       }
+      env {
+        name  = "AZURE_CLIENT_ID"
+        value = azurerm_user_assigned_identity.id.client_id
+      }
     }
     cooldown_period_in_seconds = 300
   }
