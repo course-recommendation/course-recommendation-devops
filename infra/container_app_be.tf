@@ -30,6 +30,8 @@ resource "azurerm_container_app" "ca" {
   }
 
   template {
+    min_replicas = 1
+    max_replicas = 1
     container {
       name   = "examplecontainerapp"
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
